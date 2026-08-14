@@ -1,0 +1,8 @@
+{
+  "engine": "pyspark",
+  "rows_in": 1440,
+  "feature_rows": 1440,
+  "skus": 8,
+  "date_min": "2025-01-01",
+  "date_max": "2025-06-29"
+}

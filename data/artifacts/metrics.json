@@ -1,0 +1,11 @@
+{
+  "model": "TensorFlow LSTM",
+  "window": 14,
+  "horizon_days": 14,
+  "train_windows": 1062,
+  "test_windows": 266,
+  "overall_mae": 4.14,
+  "overall_rmse": 5.6,
+  "skus": 8,
+  "scaled_test_mae": 0.5644
+}
