@@ -2,10 +2,10 @@
 
 Retail **Demand Forecasting & Insight Agent** — Spark/pandas ETL → TensorFlow forecast → LangChain Q&A, with CSV upload.
 
-## Live demo (full app — upload + Groq)
-**https://annoying-dealmaker-gerbil.ngrok-free.dev**
+## Live demo
+**https://forecastiq-4019.onrender.com**
 
-> Click **Visit Site** if ngrok shows a warning page. Use **Use demo CSV** on the page.
+Use **Use demo CSV** on the page (or upload your own). Free Render instances may cold-start in ~30–60s on first open.
 
 Static mirror: https://veera-1175.github.io/ForecastIQ/
 
@@ -26,5 +26,5 @@ python -m pipelines.train_forecast
 uvicorn app.main:app --reload --port 8000
 ```
 
-## Deploy (Render)
-Connect this repo in Render (Docker). Set `GROQ_API_KEY` and `FORCE_PANDAS_ETL=1`.
+## Deploy
+Docker on Render (`Dockerfile` + `FORCE_PANDAS_ETL=1` + `GROQ_API_KEY`).
