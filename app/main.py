@@ -42,9 +42,9 @@ class ChatIn(BaseModel):
 def home(request: Request):
     bundle = load_bundle()
     return templates.TemplateResponse(
+        request,
         "index.html",
         {
-            "request": request,
             "bundle_json": json.dumps(bundle),
             "summary": bundle["summary"],
             "kpis": bundle["kpis"],
