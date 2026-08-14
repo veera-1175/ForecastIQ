@@ -1,21 +1,38 @@
-let bundle;
+let bundle = window.__FORECAST_BUNDLE__;
 let chart;
 
-async function boot() {
-  const res = await fetch("./forecast_bundle.json");
-  bundle = await res.json();
+function apiBase() {
+  return (window.FORECASTIQ_API || "").replace(/\/$/, "");
+}
+
+function apiUrl(path) {
+  const base = apiBase();
+  return base ? `${base}${path}` : path;
+}
+
+function boot() {
+  const template = document.getElementById("templateLink");
+  if (template) template.href = apiUrl("/api/template.csv");
+
+  renderAll();
+  document.getElementById("skuSelect").addEventListener("change", (e) => renderSku(e.target.value));
+  document.getElementById("chatForm").addEventListener("submit", onChat);
+  document.getElementById("uploadBtn")?.addEventListener("click", onUpload);
+  document.getElementById("resetBtn")?.addEventListener("click", onReset);
+  seedChat();
+}
+
+function renderAll() {
   renderPipeline();
   renderKpis();
   fillSelect();
   fillTable();
-  seedChat();
-  renderSku(bundle.forecasts[0].sku_id);
-  document.getElementById("skuSelect").addEventListener("change", (e) => renderSku(e.target.value));
-  document.getElementById("chatForm").addEventListener("submit", onChat);
+  if (bundle.forecasts?.length) renderSku(bundle.forecasts[0].sku_id);
 }
 
 function renderPipeline() {
-  const el = document.getElementById("pipeline");
+  const el = document.querySelector(".pipeline") || document.getElementById("pipeline");
+  if (!el || !bundle.pipeline) return;
   const steps = bundle.pipeline.steps;
   el.innerHTML = steps
     .map(
@@ -30,7 +47,9 @@ function renderPipeline() {
 }
 
 function renderKpis() {
-  document.getElementById("kpis").innerHTML = bundle.kpis
+  const root = document.querySelector(".kpis") || document.getElementById("kpis");
+  if (!root) return;
+  root.innerHTML = bundle.kpis
     .map(
       (k) => `
     <article class="kpi" title="${k.hint}">
@@ -107,8 +126,21 @@ function renderSku(skuId) {
       responsive: true,
       plugins: { legend: { display: false } },
       scales: {
-        x: { ticks: { maxTicksLimit: 8, color: "#5c6b63", callback(val) { return this.getLabelForValue(val)?.slice(5) || ""; } }, grid: { color: "rgba(20,32,27,0.05)" } },
-        y: { ticks: { color: "#5c6b63" }, grid: { color: "rgba(20,32,27,0.06)" }, title: { display: true, text: "Units / day", color: "#5c6b63" } },
+        x: {
+          ticks: {
+            maxTicksLimit: 8,
+            color: "#5c6b63",
+            callback(val) {
+              return this.getLabelForValue(val)?.slice(5) || "";
+            },
+          },
+          grid: { color: "rgba(20,32,27,0.05)" },
+        },
+        y: {
+          ticks: { color: "#5c6b63" },
+          grid: { color: "rgba(20,32,27,0.06)" },
+          title: { display: true, text: "Units / day", color: "#5c6b63" },
+        },
       },
     },
   });
@@ -138,7 +170,63 @@ function addBubble(text, who, meta = "") {
   chatLog.scrollTop = chatLog.scrollHeight;
 }
 
-function answerQuestion(question) {
+function setStatus(msg, kind = "") {
+  const el = document.getElementById("uploadStatus");
+  if (!el) return;
+  el.textContent = msg;
+  el.className = `upload-status ${kind}`.trim();
+}
+
+async function onUpload() {
+  const input = document.getElementById("csvFile");
+  const btn = document.getElementById("uploadBtn");
+  if (!input?.files?.length) {
+    setStatus("Choose a CSV file first.", "err");
+    return;
+  }
+  const fd = new FormData();
+  fd.append("file", input.files[0]);
+  btn.disabled = true;
+  setStatus("Uploading and running Spark ETL → TensorFlow… this can take ~1 minute.");
+  try {
+    const res = await fetch(apiUrl("/api/upload"), { method: "POST", body: fd, headers: { "ngrok-skip-browser-warning": "1" } });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "Upload failed");
+    bundle = data.bundle;
+    window.__FORECAST_BUNDLE__ = bundle;
+    renderAll();
+    setStatus(
+      `Done — ${data.ingest.rows} rows, ${data.ingest.skus} SKUs (${data.ingest.date_min} → ${data.ingest.date_max}). Forecast refreshed.`,
+      "ok"
+    );
+    addBubble("Your CSV was ingested. Ask me anything about the new forecast.", "bot", "upload");
+  } catch (err) {
+    setStatus(String(err.message || err), "err");
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function onReset() {
+  const btn = document.getElementById("resetBtn");
+  btn.disabled = true;
+  setStatus("Restoring sample dataset and re-running pipeline…");
+  try {
+    const res = await fetch(apiUrl("/api/reset-sample"), { method: "POST", headers: { "ngrok-skip-browser-warning": "1" } });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "Reset failed");
+    bundle = data.bundle;
+    window.__FORECAST_BUNDLE__ = bundle;
+    renderAll();
+    setStatus("Sample dataset restored.", "ok");
+  } catch (err) {
+    setStatus(String(err.message || err), "err");
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function answerQuestionLocal(question) {
   const q = question.toLowerCase();
   const forecasts = bundle.forecasts;
   if (["restock", "stock", "inventory", "reorder"].some((k) => q.includes(k))) {
@@ -146,36 +234,46 @@ function answerQuestion(question) {
     return (
       "Based on the 14-day TensorFlow forecast, prioritize restock for:\n\n" +
       ranked.map((r) => `• ${r.sku_name} — ~${r.forecast_total_units.toFixed(0)} units (${r.insight})`).join("\n") +
-      `\n\nModel average error (MAE) is ${bundle.summary.overall_mae} units/day — use that as a safety buffer.`
+      `\n\nModel average error (MAE) is ${bundle.summary.overall_mae} units/day.`
     );
   }
-  if (["revenue", "money", "top sku", "highest"].some((k) => q.includes(k))) {
+  if (["revenue", "money", "rupee", "inr", "top sku", "highest"].some((k) => q.includes(k))) {
     const top = forecasts[0];
     const total = forecasts.reduce((s, f) => s + f.forecast_revenue, 0);
-    return `${top.sku_name} leads 14-day revenue (~₹${top.forecast_revenue.toLocaleString("en-IN", { maximumFractionDigits: 0 })}). All-SKU forecast revenue ~₹${total.toLocaleString("en-IN", { maximumFractionDigits: 0 })}.\n\n${top.insight}`;
+    return `${top.sku_name} leads 14-day revenue (~₹${top.forecast_revenue.toLocaleString("en-IN", { maximumFractionDigits: 0 })}). All-SKU ~₹${total.toLocaleString("en-IN", { maximumFractionDigits: 0 })}.\n\n${top.insight}`;
   }
-  if (["mae", "rmse", "accuracy", "error", "reliable"].some((k) => q.includes(k))) {
-    return `Holdout evaluation: MAE ${bundle.summary.overall_mae}, RMSE ${bundle.summary.overall_rmse} (units/day). Lower is better. Treat forecasts as planning signals, not guarantees.`;
-  }
-  for (const cat of ["Dairy", "Beverages", "Bakery", "Grocery", "Snacks"]) {
-    if (q.includes(cat.toLowerCase())) {
-      const subset = forecasts.filter((f) => f.category === cat);
-      const totalU = subset.reduce((s, f) => s + f.forecast_total_units, 0);
-      return `${cat} outlook: ~${totalU.toFixed(0)} units across ${subset.length} SKUs (${subset.map((f) => f.sku_name).join(", ")}) in the next 14 days.`;
-    }
+  if (["mae", "rmse", "accuracy", "error"].some((k) => q.includes(k))) {
+    return `Holdout evaluation: MAE ${bundle.summary.overall_mae}, RMSE ${bundle.summary.overall_rmse} (units/day).`;
   }
   return (
-    "Planning brief from Spark → TensorFlow → LangChain context:\n\n" +
+    "Planning brief:\n\n" +
     forecasts
       .slice(0, 3)
-      .map((f) => `• ${f.sku_name}: ${f.forecast_total_units.toFixed(0)} units · ₹${f.forecast_revenue.toLocaleString("en-IN", { maximumFractionDigits: 0 })} · ${f.insight}`)
+      .map((f) => `• ${f.sku_name}: ${f.forecast_total_units.toFixed(0)} units · ₹${f.forecast_revenue.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`)
       .join("\n")
   );
 }
 
+async function askAgent(question) {
+  try {
+    const res = await fetch(apiUrl("/api/chat"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "1" },
+      body: JSON.stringify({ question }),
+    });
+    if (!res.ok) throw new Error(`API ${res.status}`);
+    const data = await res.json();
+    return { answer: data.answer, meta: data.backend || "langchain-groq" };
+  } catch {
+    return { answer: answerQuestionLocal(question), meta: "local-fallback" };
+  }
+}
+
 function seedChat() {
+  const log = document.getElementById("chatLog");
+  if (log) log.innerHTML = "";
   addBubble(
-    "Hi — I’m your demand insight agent powered by Groq + LangChain. Ask any planning question — restock, promos, category risk, ₹ revenue, or model accuracy. Answers stay grounded in the Spark → TensorFlow forecast.",
+    "Hi — I’m your demand insight agent. Upload your own sales CSV above, or explore the sample. Ask any planning question in plain English.",
     "bot",
     "ready"
   );
@@ -184,7 +282,6 @@ function seedChat() {
     "What is the 14-day revenue outlook in rupees?",
     "How accurate is the model (MAE/RMSE)?",
     "If Dairy softens, what should we do?",
-    "Compare Coffee vs Olive Oil demand risk",
   ];
   const suggestions = document.getElementById("suggestions");
   suggestions.innerHTML = tips.map((t) => `<button type="button">${t}</button>`).join("");
@@ -194,21 +291,6 @@ function seedChat() {
       document.getElementById("chatForm").requestSubmit();
     });
   });
-}
-
-async function askAgent(question) {
-  const base = (window.FORECASTIQ_API || "").replace(/\/$/, "");
-  if (base) {
-    const res = await fetch(`${base}/api/chat`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "1" },
-      body: JSON.stringify({ question }),
-    });
-    if (!res.ok) throw new Error(`API ${res.status}`);
-    const data = await res.json();
-    return { answer: data.answer, meta: data.backend || "langchain-groq" };
-  }
-  return { answer: answerQuestion(question), meta: "local-rules" };
 }
 
 async function onChat(e) {
@@ -222,16 +304,22 @@ async function onChat(e) {
   thinking.className = "bubble bot";
   thinking.textContent = "Thinking with forecast context…";
   document.getElementById("chatLog").appendChild(thinking);
-  try {
-    const { answer, meta } = await askAgent(q);
-    thinking.remove();
-    addBubble(answer, "bot", meta);
-  } catch (err) {
-    thinking.remove();
-    addBubble(answerQuestion(q), "bot", "local-fallback");
-  }
+  const { answer, meta } = await askAgent(q);
+  thinking.remove();
+  addBubble(answer, "bot", meta);
 }
 
-boot().catch((err) => {
-  document.body.insertAdjacentHTML("afterbegin", `<p style="color:crimson;padding:12px">Failed to load forecast bundle: ${err}</p>`);
-});
+if (bundle) {
+  boot();
+} else {
+  fetch("./forecast_bundle.json")
+    .then((r) => r.json())
+    .then((b) => {
+      bundle = b;
+      window.__FORECAST_BUNDLE__ = b;
+      boot();
+    })
+    .catch((err) => {
+      document.body.insertAdjacentHTML("afterbegin", `<p style="color:crimson;padding:12px">Failed to load forecast: ${err}</p>`);
+    });
+}

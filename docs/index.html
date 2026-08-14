@@ -23,6 +23,23 @@
     <p class="tagline">See demand clearly. Act with confidence.<br /><span>Spark → TensorFlow → LangChain</span></p>
   </header>
 
+  <section class="upload panel" id="uploadPanel">
+    <div class="panel-head">
+      <div>
+        <h2>Your data</h2>
+        <p class="muted">Upload a retail sales CSV → Spark ETL → TensorFlow forecast. Sample data loads by default. Needs the live API.</p>
+      </div>
+      <a class="link-btn" id="templateLink" href="#">Download CSV template</a>
+    </div>
+    <div class="upload-row">
+      <input type="file" id="csvFile" accept=".csv,text/csv" />
+      <button type="button" id="uploadBtn" class="primary">Run pipeline</button>
+      <button type="button" id="resetBtn" class="ghost">Reset to sample</button>
+    </div>
+    <p class="upload-hint">Required columns: <code>date</code>, <code>sku_id</code>, <code>units_sold</code>. Optional: store_id, sku_name, category, unit_price, revenue, promo_flag. ~30+ days per SKU.</p>
+    <p class="upload-status" id="uploadStatus" aria-live="polite"></p>
+  </section>
+
   <section class="pipeline" aria-label="Pipeline status" id="pipeline"></section>
   <section class="kpis" id="kpis"></section>
 

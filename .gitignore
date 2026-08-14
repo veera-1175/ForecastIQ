@@ -11,7 +11,9 @@ venv/
 spark-warehouse/
 metastore_db/
 derby.log
-tmp/
+data/uploads/
+*.sample.csv
+
 *.log
 node_modules/
 frontend/dist/

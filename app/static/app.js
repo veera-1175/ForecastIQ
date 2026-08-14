@@ -1,13 +1,65 @@
-const bundle = window.__FORECAST_BUNDLE__;
-const select = document.getElementById("skuSelect");
-const table = document.getElementById("skuTable");
-const meaning = document.getElementById("chartMeaning");
-const chatLog = document.getElementById("chatLog");
-const suggestions = document.getElementById("suggestions");
-const form = document.getElementById("chatForm");
-const input = document.getElementById("chatInput");
-
+let bundle = window.__FORECAST_BUNDLE__;
 let chart;
+
+function apiBase() {
+  return (window.FORECASTIQ_API || "").replace(/\/$/, "");
+}
+
+function apiUrl(path) {
+  const base = apiBase();
+  return base ? `${base}${path}` : path;
+}
+
+function boot() {
+  const template = document.getElementById("templateLink");
+  if (template) template.href = apiUrl("/api/template.csv");
+
+  renderAll();
+  document.getElementById("skuSelect").addEventListener("change", (e) => renderSku(e.target.value));
+  document.getElementById("chatForm").addEventListener("submit", onChat);
+  document.getElementById("uploadBtn")?.addEventListener("click", onUpload);
+  document.getElementById("resetBtn")?.addEventListener("click", onReset);
+  seedChat();
+}
+
+function renderAll() {
+  renderPipeline();
+  renderKpis();
+  fillSelect();
+  fillTable();
+  if (bundle.forecasts?.length) renderSku(bundle.forecasts[0].sku_id);
+}
+
+function renderPipeline() {
+  const el = document.querySelector(".pipeline") || document.getElementById("pipeline");
+  if (!el || !bundle.pipeline) return;
+  const steps = bundle.pipeline.steps;
+  el.innerHTML = steps
+    .map(
+      (step, i) => `
+      <div class="pipe-step ${step.status}">
+        <div class="pipe-dot"></div>
+        <div><strong>${step.label}</strong><p>${step.detail}</p></div>
+      </div>
+      ${i < steps.length - 1 ? '<div class="pipe-line"></div>' : ""}`
+    )
+    .join("");
+}
+
+function renderKpis() {
+  const root = document.querySelector(".kpis") || document.getElementById("kpis");
+  if (!root) return;
+  root.innerHTML = bundle.kpis
+    .map(
+      (k) => `
+    <article class="kpi" title="${k.hint}">
+      <p class="kpi-label">${k.label}</p>
+      <p class="kpi-value">${k.value}</p>
+      <p class="kpi-hint">${k.hint}</p>
+    </article>`
+    )
+    .join("");
+}
 
 function skuMap() {
   const m = {};
@@ -16,12 +68,13 @@ function skuMap() {
 }
 
 function fillSelect() {
-  select.innerHTML = bundle.forecasts
+  document.getElementById("skuSelect").innerHTML = bundle.forecasts
     .map((f) => `<option value="${f.sku_id}">${f.sku_name}</option>`)
     .join("");
 }
 
 function fillTable() {
+  const table = document.getElementById("skuTable");
   table.innerHTML = bundle.forecasts
     .map(
       (f) => `
@@ -35,27 +88,25 @@ function fillTable() {
       </tr>`
     )
     .join("");
-
   table.querySelectorAll("tr").forEach((tr) => {
     tr.addEventListener("click", () => {
-      select.value = tr.dataset.sku;
+      document.getElementById("skuSelect").value = tr.dataset.sku;
       renderSku(tr.dataset.sku);
-      table.querySelectorAll("tr").forEach((r) => r.classList.remove("active"));
-      tr.classList.add("active");
     });
   });
+}
+
+function avg(arr) {
+  return arr.reduce((a, b) => a + b, 0) / Math.max(arr.length, 1);
 }
 
 function renderSku(skuId) {
   const f = skuMap()[skuId];
   if (!f) return;
-
   const histLabels = f.history.map((h) => h.date);
   const histVals = f.history.map((h) => h.units);
   const futLabels = f.forecast.map((h) => h.date);
   const futVals = f.forecast.map((h) => h.units);
-
-  // bridge: last actual point connects visually
   const labels = [...histLabels, ...futLabels];
   const actual = [...histVals, ...Array(futVals.length).fill(null)];
   const forecast = [...Array(histVals.length - 1).fill(null), histVals[histVals.length - 1], ...futVals];
@@ -67,47 +118,20 @@ function renderSku(skuId) {
     data: {
       labels,
       datasets: [
-        {
-          label: "Actual",
-          data: actual,
-          borderColor: "#1f6f54",
-          backgroundColor: "rgba(31,111,84,0.12)",
-          tension: 0.25,
-          pointRadius: 0,
-          borderWidth: 2,
-          spanGaps: false,
-        },
-        {
-          label: "Forecast",
-          data: forecast,
-          borderColor: "#c45c26",
-          backgroundColor: "rgba(196,92,38,0.10)",
-          borderDash: [6, 4],
-          tension: 0.25,
-          pointRadius: 0,
-          borderWidth: 2,
-          spanGaps: false,
-        },
+        { label: "Actual", data: actual, borderColor: "#1f6f54", backgroundColor: "rgba(31,111,84,0.12)", tension: 0.25, pointRadius: 0, borderWidth: 2 },
+        { label: "Forecast", data: forecast, borderColor: "#c45c26", backgroundColor: "rgba(196,92,38,0.10)", borderDash: [6, 4], tension: 0.25, pointRadius: 0, borderWidth: 2 },
       ],
     },
     options: {
       responsive: true,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: (c) => `${c.dataset.label}: ${Number(c.raw).toFixed(1)} units`,
-          },
-        },
-      },
+      plugins: { legend: { display: false } },
       scales: {
         x: {
           ticks: {
             maxTicksLimit: 8,
             color: "#5c6b63",
-            callback(val, i) {
-              const label = this.getLabelForValue(val);
-              return label?.slice(5) || "";
+            callback(val) {
+              return this.getLabelForValue(val)?.slice(5) || "";
             },
           },
           grid: { color: "rgba(20,32,27,0.05)" },
@@ -125,17 +149,10 @@ function renderSku(skuId) {
   const second = avg(futVals.slice(7));
   const delta = ((second - first) / Math.max(first, 1)) * 100;
   const dir = delta > 5 ? "up" : delta < -5 ? "down" : "flat";
-  meaning.innerHTML = `<strong>${f.sku_name}</strong> — ${f.insight}
+  document.getElementById("chartMeaning").innerHTML = `<strong>${f.sku_name}</strong> — ${f.insight}
     Week-2 vs week-1 forecast is <strong>${dir}</strong> (${delta >= 0 ? "+" : ""}${delta.toFixed(1)}%).
-    Typical miss ≈ <strong>${f.mae}</strong> units/day (MAE). Use this for reorder buffers, not exact cartons.`;
-
-  table.querySelectorAll("tr").forEach((r) => {
-    r.classList.toggle("active", r.dataset.sku === skuId);
-  });
-}
-
-function avg(arr) {
-  return arr.reduce((a, b) => a + b, 0) / Math.max(arr.length, 1);
+    Typical miss ≈ <strong>${f.mae}</strong> units/day (MAE).`;
+  document.querySelectorAll("#skuTable tr").forEach((r) => r.classList.toggle("active", r.dataset.sku === skuId));
 }
 
 function addBubble(text, who, meta = "") {
@@ -148,35 +165,137 @@ function addBubble(text, who, meta = "") {
     m.textContent = meta;
     el.appendChild(m);
   }
+  const chatLog = document.getElementById("chatLog");
   chatLog.appendChild(el);
   chatLog.scrollTop = chatLog.scrollHeight;
 }
 
+function setStatus(msg, kind = "") {
+  const el = document.getElementById("uploadStatus");
+  if (!el) return;
+  el.textContent = msg;
+  el.className = `upload-status ${kind}`.trim();
+}
+
+async function onUpload() {
+  const input = document.getElementById("csvFile");
+  const btn = document.getElementById("uploadBtn");
+  if (!input?.files?.length) {
+    setStatus("Choose a CSV file first.", "err");
+    return;
+  }
+  const fd = new FormData();
+  fd.append("file", input.files[0]);
+  btn.disabled = true;
+  setStatus("Uploading and running Spark ETL → TensorFlow… this can take ~1 minute.");
+  try {
+    const res = await fetch(apiUrl("/api/upload"), { method: "POST", body: fd, headers: { "ngrok-skip-browser-warning": "1" } });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "Upload failed");
+    bundle = data.bundle;
+    window.__FORECAST_BUNDLE__ = bundle;
+    renderAll();
+    setStatus(
+      `Done — ${data.ingest.rows} rows, ${data.ingest.skus} SKUs (${data.ingest.date_min} → ${data.ingest.date_max}). Forecast refreshed.`,
+      "ok"
+    );
+    addBubble("Your CSV was ingested. Ask me anything about the new forecast.", "bot", "upload");
+  } catch (err) {
+    setStatus(String(err.message || err), "err");
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function onReset() {
+  const btn = document.getElementById("resetBtn");
+  btn.disabled = true;
+  setStatus("Restoring sample dataset and re-running pipeline…");
+  try {
+    const res = await fetch(apiUrl("/api/reset-sample"), { method: "POST", headers: { "ngrok-skip-browser-warning": "1" } });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "Reset failed");
+    bundle = data.bundle;
+    window.__FORECAST_BUNDLE__ = bundle;
+    renderAll();
+    setStatus("Sample dataset restored.", "ok");
+  } catch (err) {
+    setStatus(String(err.message || err), "err");
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function answerQuestionLocal(question) {
+  const q = question.toLowerCase();
+  const forecasts = bundle.forecasts;
+  if (["restock", "stock", "inventory", "reorder"].some((k) => q.includes(k))) {
+    const ranked = [...forecasts].sort((a, b) => b.forecast_total_units - a.forecast_total_units).slice(0, 3);
+    return (
+      "Based on the 14-day TensorFlow forecast, prioritize restock for:\n\n" +
+      ranked.map((r) => `• ${r.sku_name} — ~${r.forecast_total_units.toFixed(0)} units (${r.insight})`).join("\n") +
+      `\n\nModel average error (MAE) is ${bundle.summary.overall_mae} units/day.`
+    );
+  }
+  if (["revenue", "money", "rupee", "inr", "top sku", "highest"].some((k) => q.includes(k))) {
+    const top = forecasts[0];
+    const total = forecasts.reduce((s, f) => s + f.forecast_revenue, 0);
+    return `${top.sku_name} leads 14-day revenue (~₹${top.forecast_revenue.toLocaleString("en-IN", { maximumFractionDigits: 0 })}). All-SKU ~₹${total.toLocaleString("en-IN", { maximumFractionDigits: 0 })}.\n\n${top.insight}`;
+  }
+  if (["mae", "rmse", "accuracy", "error"].some((k) => q.includes(k))) {
+    return `Holdout evaluation: MAE ${bundle.summary.overall_mae}, RMSE ${bundle.summary.overall_rmse} (units/day).`;
+  }
+  return (
+    "Planning brief:\n\n" +
+    forecasts
+      .slice(0, 3)
+      .map((f) => `• ${f.sku_name}: ${f.forecast_total_units.toFixed(0)} units · ₹${f.forecast_revenue.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`)
+      .join("\n")
+  );
+}
+
+async function askAgent(question) {
+  try {
+    const res = await fetch(apiUrl("/api/chat"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "1" },
+      body: JSON.stringify({ question }),
+    });
+    if (!res.ok) throw new Error(`API ${res.status}`);
+    const data = await res.json();
+    return { answer: data.answer, meta: data.backend || "langchain-groq" };
+  } catch {
+    return { answer: answerQuestionLocal(question), meta: "local-fallback" };
+  }
+}
+
 function seedChat() {
+  const log = document.getElementById("chatLog");
+  if (log) log.innerHTML = "";
   addBubble(
-    "Hi — I’m your demand insight agent. Ask about restock, revenue, categories, or model accuracy. Answers are grounded in the Spark → TensorFlow forecast.",
+    "Hi — I’m your demand insight agent. Upload your own sales CSV above, or explore the sample. Ask any planning question in plain English.",
     "bot",
     "ready"
   );
   const tips = [
     "Which SKUs should we restock first?",
-    "What is the 14-day revenue outlook?",
+    "What is the 14-day revenue outlook in rupees?",
     "How accurate is the model (MAE/RMSE)?",
-    "How is Dairy category demand looking?",
+    "If Dairy softens, what should we do?",
   ];
-  suggestions.innerHTML = tips
-    .map((t) => `<button type="button" data-q="${t.replaceAll('"', "&quot;")}">${t}</button>`)
-    .join("");
+  const suggestions = document.getElementById("suggestions");
+  suggestions.innerHTML = tips.map((t) => `<button type="button">${t}</button>`).join("");
   suggestions.querySelectorAll("button").forEach((b) => {
     b.addEventListener("click", () => {
-      input.value = b.dataset.q;
-      form.requestSubmit();
+      document.getElementById("chatInput").value = b.textContent;
+      document.getElementById("chatForm").requestSubmit();
     });
   });
 }
 
-form.addEventListener("submit", async (e) => {
+async function onChat(e) {
   e.preventDefault();
+  const input = document.getElementById("chatInput");
   const q = input.value.trim();
   if (!q) return;
   addBubble(q, "user");
@@ -184,26 +303,23 @@ form.addEventListener("submit", async (e) => {
   const thinking = document.createElement("div");
   thinking.className = "bubble bot";
   thinking.textContent = "Thinking with forecast context…";
-  chatLog.appendChild(thinking);
-  chatLog.scrollTop = chatLog.scrollHeight;
+  document.getElementById("chatLog").appendChild(thinking);
+  const { answer, meta } = await askAgent(q);
+  thinking.remove();
+  addBubble(answer, "bot", meta);
+}
 
-  try {
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question: q }),
+if (bundle) {
+  boot();
+} else {
+  fetch("./forecast_bundle.json")
+    .then((r) => r.json())
+    .then((b) => {
+      bundle = b;
+      window.__FORECAST_BUNDLE__ = b;
+      boot();
+    })
+    .catch((err) => {
+      document.body.insertAdjacentHTML("afterbegin", `<p style="color:crimson;padding:12px">Failed to load forecast: ${err}</p>`);
     });
-    const data = await res.json();
-    thinking.remove();
-    addBubble(data.answer, "bot", data.backend);
-  } catch (err) {
-    thinking.textContent = "Could not reach the agent. Try again.";
-  }
-});
-
-select.addEventListener("change", () => renderSku(select.value));
-
-fillSelect();
-fillTable();
-seedChat();
-renderSku(bundle.forecasts[0].sku_id);
+}

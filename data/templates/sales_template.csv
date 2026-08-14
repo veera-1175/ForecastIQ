@@ -1,0 +1,3 @@
+date,store_id,sku_id,sku_name,category,unit_price,units_sold,revenue,promo_flag
+2025-01-01,STR-BLR-01,SKU-1001,Organic Milk 1L,Dairy,68,42,2856,0
+2025-01-02,STR-BLR-01,SKU-1001,Organic Milk 1L,Dairy,68,38,2584,0

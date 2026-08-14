@@ -6,16 +6,16 @@
     "train_windows": 1062,
     "test_windows": 266,
     "overall_mae": 4.14,
-    "overall_rmse": 5.61,
+    "overall_rmse": 5.62,
     "skus": 8,
-    "scaled_test_mae": 0.5663
+    "scaled_test_mae": 0.5695
   },
   "sku_metrics": [
     {
       "sku_id": "SKU-1001",
       "sku_name": "Organic Milk 1L",
       "category": "Dairy",
-      "mae": 2.95,
+      "mae": 2.94,
       "rmse": 3.46,
       "avg_daily_units": 31.24
     },
@@ -23,16 +23,16 @@
       "sku_id": "SKU-1002",
       "sku_name": "Whole Wheat Bread",
       "category": "Bakery",
-      "mae": 5.92,
-      "rmse": 9.09,
+      "mae": 6.01,
+      "rmse": 9.2,
       "avg_daily_units": 77.84
     },
     {
       "sku_id": "SKU-1003",
       "sku_name": "Arabica Coffee 250g",
       "category": "Beverages",
-      "mae": 4.86,
-      "rmse": 6.62,
+      "mae": 4.67,
+      "rmse": 6.41,
       "avg_daily_units": 55.25
     },
     {
@@ -40,7 +40,7 @@
       "sku_name": "Basmati Rice 5kg",
       "category": "Grocery",
       "mae": 2.04,
-      "rmse": 2.53,
+      "rmse": 2.61,
       "avg_daily_units": 39.29
     },
     {
@@ -48,31 +48,31 @@
       "sku_name": "Greek Yogurt Pack",
       "category": "Dairy",
       "mae": 4.8,
-      "rmse": 5.76,
+      "rmse": 5.77,
       "avg_daily_units": 63.96
     },
     {
       "sku_id": "SKU-1006",
       "sku_name": "Sparkling Water 12pk",
       "category": "Beverages",
-      "mae": 4.03,
-      "rmse": 4.64,
+      "mae": 4.19,
+      "rmse": 4.78,
       "avg_daily_units": 57.52
     },
     {
       "sku_id": "SKU-1007",
       "sku_name": "Dark Chocolate Bar",
       "category": "Snacks",
-      "mae": 3.42,
-      "rmse": 5.65,
+      "mae": 3.38,
+      "rmse": 5.64,
       "avg_daily_units": 43.13
     },
     {
       "sku_id": "SKU-1008",
       "sku_name": "Olive Oil 1L",
       "category": "Grocery",
-      "mae": 5.06,
-      "rmse": 7.09,
+      "mae": 5.08,
+      "rmse": 7.06,
       "avg_daily_units": 48.36
     }
   ],
@@ -327,65 +327,65 @@
       "forecast": [
         {
           "date": "2025-06-30",
-          "units": 44.92
+          "units": 44.8
         },
         {
           "date": "2025-07-01",
-          "units": 46.46
+          "units": 46.29
         },
         {
           "date": "2025-07-02",
-          "units": 47.4
+          "units": 47.23
         },
         {
           "date": "2025-07-03",
-          "units": 51.19
+          "units": 50.99
         },
         {
           "date": "2025-07-04",
-          "units": 52.3
+          "units": 52.17
         },
         {
           "date": "2025-07-05",
-          "units": 52.92
+          "units": 52.86
         },
         {
           "date": "2025-07-06",
-          "units": 54.47
+          "units": 54.39
         },
         {
           "date": "2025-07-07",
-          "units": 56.63
+          "units": 56.36
         },
         {
           "date": "2025-07-08",
-          "units": 56.72
+          "units": 56.37
         },
         {
           "date": "2025-07-09",
-          "units": 57.0
+          "units": 56.77
         },
         {
           "date": "2025-07-10",
-          "units": 56.39
+          "units": 56.34
         },
         {
           "date": "2025-07-11",
-          "units": 54.8
+          "units": 54.69
         },
         {
           "date": "2025-07-12",
-          "units": 53.9
+          "units": 53.78
         },
         {
           "date": "2025-07-13",
-          "units": 51.48
+          "units": 51.38
         }
       ],
-      "forecast_total_units": 736.58,
-      "forecast_revenue": 405119.0,
-      "mae": 5.06,
-      "rmse": 7.09,
+      "forecast_total_units": 734.42,
+      "forecast_revenue": 403931.0,
+      "mae": 5.08,
+      "rmse": 7.06,
       "insight": "Olive Oil 1L: rising demand over the next two weeks. Model typical error \u2248 5.1 units/day."
     },
     {
@@ -638,65 +638,65 @@
       "forecast": [
         {
           "date": "2025-06-30",
-          "units": 38.67
+          "units": 38.87
         },
         {
           "date": "2025-07-01",
-          "units": 40.29
+          "units": 40.38
         },
         {
           "date": "2025-07-02",
-          "units": 41.91
+          "units": 42.03
         },
         {
           "date": "2025-07-03",
-          "units": 43.52
+          "units": 43.81
         },
         {
           "date": "2025-07-04",
-          "units": 45.42
+          "units": 45.65
         },
         {
           "date": "2025-07-05",
-          "units": 46.89
+          "units": 46.91
         },
         {
           "date": "2025-07-06",
-          "units": 47.72
+          "units": 47.57
         },
         {
           "date": "2025-07-07",
-          "units": 48.25
+          "units": 48.18
         },
         {
           "date": "2025-07-08",
-          "units": 47.94
+          "units": 47.85
         },
         {
           "date": "2025-07-09",
-          "units": 46.68
+          "units": 46.65
         },
         {
           "date": "2025-07-10",
-          "units": 45.46
+          "units": 45.33
         },
         {
           "date": "2025-07-11",
-          "units": 43.15
+          "units": 42.91
         },
         {
           "date": "2025-07-12",
-          "units": 41.8
+          "units": 41.45
         },
         {
           "date": "2025-07-13",
-          "units": 41.16
+          "units": 40.43
         }
       ],
-      "forecast_total_units": 618.86,
-      "forecast_revenue": 402259.0,
+      "forecast_total_units": 618.02,
+      "forecast_revenue": 401713.0,
       "mae": 2.04,
-      "rmse": 2.53,
+      "rmse": 2.61,
       "insight": "Basmati Rice 5kg: stable demand. Model typical error \u2248 2.0 units/day."
     },
     {
@@ -949,66 +949,66 @@
       "forecast": [
         {
           "date": "2025-06-30",
-          "units": 59.53
+          "units": 59.8
         },
         {
           "date": "2025-07-01",
-          "units": 61.88
+          "units": 62.17
         },
         {
           "date": "2025-07-02",
-          "units": 63.51
+          "units": 63.61
         },
         {
           "date": "2025-07-03",
-          "units": 64.9
+          "units": 64.76
         },
         {
           "date": "2025-07-04",
-          "units": 65.44
+          "units": 65.42
         },
         {
           "date": "2025-07-05",
-          "units": 65.28
+          "units": 65.23
         },
         {
           "date": "2025-07-06",
-          "units": 64.95
+          "units": 64.92
         },
         {
           "date": "2025-07-07",
-          "units": 63.19
+          "units": 63.17
         },
         {
           "date": "2025-07-08",
-          "units": 60.99
+          "units": 60.88
         },
         {
           "date": "2025-07-09",
-          "units": 58.7
+          "units": 58.58
         },
         {
           "date": "2025-07-10",
-          "units": 57.42
+          "units": 56.75
         },
         {
           "date": "2025-07-11",
-          "units": 56.03
+          "units": 55.27
         },
         {
           "date": "2025-07-12",
-          "units": 55.33
+          "units": 54.45
         },
         {
           "date": "2025-07-13",
-          "units": 52.76
+          "units": 52.29
         }
       ],
-      "forecast_total_units": 849.91,
-      "forecast_revenue": 356962.2,
-      "mae": 4.86,
-      "rmse": 6.62,
-      "insight": "Arabica Coffee 250g: softening demand \u2014 consider promo or stock reduction. Model typical error \u2248 4.9 units/day."
+      "forecast_total_units": 847.3,
+      "forecast_revenue": 355866.0,
+      "mae": 4.67,
+      "rmse": 6.41,
+      "insight": "Arabica Coffee 250g: softening demand \u2014 consider promo or stock reduction. Model typical error \u2248 4.7 units/day."
     },
     {
       "sku_id": "SKU-1006",
@@ -1260,66 +1260,66 @@
       "forecast": [
         {
           "date": "2025-06-30",
-          "units": 58.92
+          "units": 58.85
         },
         {
           "date": "2025-07-01",
-          "units": 61.23
+          "units": 61.21
         },
         {
           "date": "2025-07-02",
-          "units": 63.37
+          "units": 63.59
         },
         {
           "date": "2025-07-03",
-          "units": 65.11
+          "units": 65.35
         },
         {
           "date": "2025-07-04",
-          "units": 66.26
+          "units": 66.35
         },
         {
           "date": "2025-07-05",
-          "units": 67.5
+          "units": 67.38
         },
         {
           "date": "2025-07-06",
-          "units": 68.62
+          "units": 68.43
         },
         {
           "date": "2025-07-07",
-          "units": 68.86
+          "units": 68.67
         },
         {
           "date": "2025-07-08",
-          "units": 68.7
+          "units": 68.6
         },
         {
           "date": "2025-07-09",
-          "units": 68.08
+          "units": 68.09
         },
         {
           "date": "2025-07-10",
-          "units": 64.98
+          "units": 64.86
         },
         {
           "date": "2025-07-11",
-          "units": 61.82
+          "units": 61.71
         },
         {
           "date": "2025-07-12",
-          "units": 60.16
+          "units": 59.45
         },
         {
           "date": "2025-07-13",
-          "units": 58.87
+          "units": 57.99
         }
       ],
-      "forecast_total_units": 902.48,
-      "forecast_revenue": 252694.4,
-      "mae": 4.03,
-      "rmse": 4.64,
-      "insight": "Sparkling Water 12pk: stable demand. Model typical error \u2248 4.0 units/day."
+      "forecast_total_units": 900.53,
+      "forecast_revenue": 252148.4,
+      "mae": 4.19,
+      "rmse": 4.78,
+      "insight": "Sparkling Water 12pk: stable demand. Model typical error \u2248 4.2 units/day."
     },
     {
       "sku_id": "SKU-1005",
@@ -1571,65 +1571,65 @@
       "forecast": [
         {
           "date": "2025-06-30",
-          "units": 62.64
+          "units": 62.81
         },
         {
           "date": "2025-07-01",
-          "units": 64.78
+          "units": 64.85
         },
         {
           "date": "2025-07-02",
-          "units": 68.19
+          "units": 68.36
         },
         {
           "date": "2025-07-03",
-          "units": 69.58
+          "units": 69.92
         },
         {
           "date": "2025-07-04",
-          "units": 71.05
+          "units": 71.27
         },
         {
           "date": "2025-07-05",
-          "units": 72.94
+          "units": 72.91
         },
         {
           "date": "2025-07-06",
-          "units": 74.3
+          "units": 74.03
         },
         {
           "date": "2025-07-07",
-          "units": 74.79
+          "units": 74.53
         },
         {
           "date": "2025-07-08",
-          "units": 74.6
+          "units": 74.42
         },
         {
           "date": "2025-07-09",
-          "units": 73.03
+          "units": 72.81
         },
         {
           "date": "2025-07-10",
-          "units": 70.18
+          "units": 69.79
         },
         {
           "date": "2025-07-11",
-          "units": 68.34
+          "units": 67.91
         },
         {
           "date": "2025-07-12",
-          "units": 66.06
+          "units": 65.38
         },
         {
           "date": "2025-07-13",
-          "units": 65.67
+          "units": 64.69
         }
       ],
-      "forecast_total_units": 976.15,
-      "forecast_revenue": 92734.25,
+      "forecast_total_units": 973.68,
+      "forecast_revenue": 92499.6,
       "mae": 4.8,
-      "rmse": 5.76,
+      "rmse": 5.77,
       "insight": "Greek Yogurt Pack: stable demand. Model typical error \u2248 4.8 units/day."
     },
     {
@@ -1882,65 +1882,65 @@
       "forecast": [
         {
           "date": "2025-06-30",
-          "units": 43.24
+          "units": 43.01
         },
         {
           "date": "2025-07-01",
-          "units": 44.7
+          "units": 44.46
         },
         {
           "date": "2025-07-02",
-          "units": 46.03
+          "units": 45.74
         },
         {
           "date": "2025-07-03",
-          "units": 47.39
+          "units": 47.17
         },
         {
           "date": "2025-07-04",
-          "units": 48.03
+          "units": 47.94
         },
         {
           "date": "2025-07-05",
-          "units": 48.22
+          "units": 48.11
         },
         {
           "date": "2025-07-06",
-          "units": 49.0
+          "units": 48.78
         },
         {
           "date": "2025-07-07",
-          "units": 51.33
+          "units": 51.03
         },
         {
           "date": "2025-07-08",
-          "units": 51.12
+          "units": 50.93
         },
         {
           "date": "2025-07-09",
-          "units": 50.35
+          "units": 50.2
         },
         {
           "date": "2025-07-10",
-          "units": 48.98
+          "units": 48.78
         },
         {
           "date": "2025-07-11",
-          "units": 46.75
+          "units": 46.5
         },
         {
           "date": "2025-07-12",
-          "units": 45.18
+          "units": 44.83
         },
         {
           "date": "2025-07-13",
-          "units": 44.55
+          "units": 43.94
         }
       ],
-      "forecast_total_units": 664.87,
-      "forecast_revenue": 79784.4,
-      "mae": 3.42,
-      "rmse": 5.65,
+      "forecast_total_units": 661.42,
+      "forecast_revenue": 79370.4,
+      "mae": 3.38,
+      "rmse": 5.64,
       "insight": "Dark Chocolate Bar: stable demand. Model typical error \u2248 3.4 units/day."
     },
     {
@@ -2193,66 +2193,66 @@
       "forecast": [
         {
           "date": "2025-06-30",
-          "units": 83.76
+          "units": 83.95
         },
         {
           "date": "2025-07-01",
-          "units": 87.11
+          "units": 87.66
         },
         {
           "date": "2025-07-02",
-          "units": 90.25
+          "units": 90.51
         },
         {
           "date": "2025-07-03",
-          "units": 93.07
+          "units": 92.9
         },
         {
           "date": "2025-07-04",
-          "units": 94.26
+          "units": 93.92
         },
         {
           "date": "2025-07-05",
-          "units": 94.62
+          "units": 94.34
         },
         {
           "date": "2025-07-06",
-          "units": 93.61
+          "units": 93.37
         },
         {
           "date": "2025-07-07",
-          "units": 91.54
+          "units": 91.26
         },
         {
           "date": "2025-07-08",
-          "units": 88.08
+          "units": 87.56
         },
         {
           "date": "2025-07-09",
-          "units": 85.37
+          "units": 84.68
         },
         {
           "date": "2025-07-10",
-          "units": 82.46
+          "units": 81.34
         },
         {
           "date": "2025-07-11",
-          "units": 79.7
+          "units": 78.37
         },
         {
           "date": "2025-07-12",
-          "units": 79.2
+          "units": 77.42
         },
         {
           "date": "2025-07-13",
-          "units": 74.69
+          "units": 73.69
         }
       ],
-      "forecast_total_units": 1217.72,
-      "forecast_revenue": 54797.4,
-      "mae": 5.92,
-      "rmse": 9.09,
-      "insight": "Whole Wheat Bread: softening demand \u2014 consider promo or stock reduction. Model typical error \u2248 5.9 units/day."
+      "forecast_total_units": 1210.97,
+      "forecast_revenue": 54493.65,
+      "mae": 6.01,
+      "rmse": 9.2,
+      "insight": "Whole Wheat Bread: softening demand \u2014 consider promo or stock reduction. Model typical error \u2248 6.0 units/day."
     },
     {
       "sku_id": "SKU-1001",
@@ -2504,64 +2504,64 @@
       "forecast": [
         {
           "date": "2025-06-30",
-          "units": 33.78
+          "units": 33.88
         },
         {
           "date": "2025-07-01",
-          "units": 35.08
+          "units": 35.25
         },
         {
           "date": "2025-07-02",
-          "units": 36.03
+          "units": 36.11
         },
         {
           "date": "2025-07-03",
-          "units": 37.1
+          "units": 37.02
         },
         {
           "date": "2025-07-04",
-          "units": 37.39
+          "units": 37.33
         },
         {
           "date": "2025-07-05",
-          "units": 37.29
+          "units": 37.22
         },
         {
           "date": "2025-07-06",
-          "units": 37.16
+          "units": 37.11
         },
         {
           "date": "2025-07-07",
-          "units": 36.71
+          "units": 36.69
         },
         {
           "date": "2025-07-08",
-          "units": 35.44
+          "units": 35.36
         },
         {
           "date": "2025-07-09",
-          "units": 34.0
+          "units": 33.87
         },
         {
           "date": "2025-07-10",
-          "units": 32.64
+          "units": 32.27
         },
         {
           "date": "2025-07-11",
-          "units": 31.92
+          "units": 31.46
         },
         {
           "date": "2025-07-12",
-          "units": 30.96
+          "units": 30.55
         },
         {
           "date": "2025-07-13",
-          "units": 29.91
+          "units": 29.61
         }
       ],
-      "forecast_total_units": 485.41,
-      "forecast_revenue": 33007.88,
-      "mae": 2.95,
+      "forecast_total_units": 483.73,
+      "forecast_revenue": 32893.64,
+      "mae": 2.94,
       "rmse": 3.46,
       "insight": "Organic Milk 1L: softening demand \u2014 consider promo or stock reduction. Model typical error \u2248 2.9 units/day."
     }
@@ -2569,12 +2569,12 @@
   "kpis": [
     {
       "label": "14-day forecast units",
-      "value": "6,452",
+      "value": "6,430",
       "hint": "Total predicted units across all SKUs"
     },
     {
       "label": "14-day forecast revenue",
-      "value": "\u20b91,677,359",
+      "value": "\u20b91,672,916",
       "hint": "Units \u00d7 unit price (INR list price)"
     },
     {
@@ -2600,7 +2600,7 @@
         "id": "model",
         "label": "TensorFlow Forecast",
         "status": "done",
-        "detail": "LSTM trained \u00b7 MAE 4.14 \u00b7 RMSE 5.61"
+        "detail": "LSTM trained \u00b7 MAE 4.14 \u00b7 RMSE 5.62"
       },
       {
         "id": "agent",

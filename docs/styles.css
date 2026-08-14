@@ -273,12 +273,63 @@ tbody tr { cursor: pointer; }
 tbody tr:hover { background: #f5faf7; }
 tbody tr.active { background: #eaf5ef; }
 
-.foot {
+.upload {
   max-width: 1180px;
-  margin: 8px auto 0;
+  margin: 0 auto 16px;
+}
+.upload-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.upload-row input[type="file"] {
+  flex: 1;
+  min-width: 220px;
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  padding: 10px;
+  background: #fbfdfb;
+}
+.primary, .ghost, .link-btn {
+  font: inherit;
+  border-radius: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  text-decoration: none;
+}
+.primary {
+  border: 0;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+.primary:disabled { opacity: 0.6; cursor: wait; }
+.ghost {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+}
+.link-btn {
+  border: 1px solid var(--line);
+  background: #fbfdfb;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+}
+.upload-hint, .upload-status {
+  margin: 10px 0 0;
   color: var(--muted);
   font-size: 12.5px;
-  text-align: center;
+  line-height: 1.4;
+}
+.upload-status.ok { color: var(--accent); font-weight: 600; }
+.upload-status.err { color: #a33b2c; font-weight: 600; }
+.upload-hint code {
+  font-size: 12px;
+  background: #eef6f1;
+  padding: 1px 5px;
+  border-radius: 4px;
 }
 
 @media (max-width: 960px) {

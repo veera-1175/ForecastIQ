@@ -56,7 +56,7 @@ def _forecast_sku(series: np.ndarray, model: keras.Model, scaler: StandardScaler
     return preds
 
 
-def train() -> dict:
+def train(epochs: int = 12) -> dict:
     if not FEATURES.exists():
         from pipelines.spark_etl import run as etl
 
@@ -96,6 +96,9 @@ def train() -> dict:
             }
         )
 
+    if not all_x:
+        raise ValueError("Not enough history to train. Provide longer daily series per SKU.")
+
     X = np.concatenate(all_x).reshape(-1, WINDOW, 1)
     y = np.concatenate(all_y)
 
@@ -108,13 +111,17 @@ def train() -> dict:
     model.fit(
         X_train,
         y_train,
-        validation_data=(X_test, y_test),
-        epochs=12,
+        validation_data=(X_test, y_test) if len(X_test) else None,
+        epochs=max(3, int(epochs)),
         batch_size=64,
         verbose=0,
     )
 
-    y_pred = model.predict(X_test, verbose=0).ravel()
+    if len(X_test):
+        y_pred = model.predict(X_test, verbose=0).ravel()
+        scaled_test_mae = round(float(mean_absolute_error(y_test, y_pred)), 4)
+    else:
+        scaled_test_mae = 0.0
     # Metrics in scaled space are not business-friendly; report on inverse using identity approx via MAE on scaled * mean scale
     # Better: evaluate per-SKU in original units with recursive 1-step on holdout tail
     per_sku_metrics = []
@@ -190,7 +197,7 @@ def train() -> dict:
         "overall_mae": overall_mae,
         "overall_rmse": overall_rmse,
         "skus": len(forecasts),
-        "scaled_test_mae": round(float(mean_absolute_error(y_test, y_pred)), 4),
+        "scaled_test_mae": scaled_test_mae,
     }
 
     payload = {
