@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ForecastIQ — Retail Demand & Insight Agent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <header class="top">
+    <div class="brand">
+      <div class="mark" aria-hidden="true"></div>
+      <div>
+        <p class="eyebrow">Retail decision intelligence</p>
+        <h1>ForecastIQ</h1>
+      </div>
+    </div>
+    <p class="tagline">See demand clearly. Act with confidence.<br /><span>Spark → TensorFlow → LangChain</span></p>
+  </header>
+
+  <section class="pipeline" aria-label="Pipeline status" id="pipeline"></section>
+  <section class="kpis" id="kpis"></section>
+
+  <main class="layout">
+    <section class="panel chart-panel">
+      <div class="panel-head">
+        <div>
+          <h2>Demand outlook</h2>
+          <p class="muted">History vs next-14-day forecast — pick a SKU to inspect</p>
+        </div>
+        <label class="sku-pick">
+          <span>SKU</span>
+          <select id="skuSelect"></select>
+        </label>
+      </div>
+      <canvas id="demandChart" height="120"></canvas>
+      <div class="meaning" id="chartMeaning"></div>
+      <div class="legend-row">
+        <span><i class="swatch hist"></i> Actual sales</span>
+        <span><i class="swatch fut"></i> Forecast</span>
+        <span class="tip" title="MAE = average absolute miss in units/day">What is MAE?</span>
+      </div>
+    </section>
+
+    <section class="panel chat-panel">
+      <div class="panel-head">
+        <div>
+          <h2>Ask the insight agent</h2>
+          <p class="muted">Plain English answers grounded in the forecast</p>
+        </div>
+      </div>
+      <div id="chatLog" class="chat-log" aria-live="polite"></div>
+      <div class="suggestions" id="suggestions"></div>
+      <form id="chatForm" class="chat-form">
+        <input id="chatInput" type="text" placeholder="e.g. Which SKUs should we restock first?" autocomplete="off" required />
+        <button type="submit">Ask</button>
+      </form>
+    </section>
+  </main>
+
+  <section class="panel table-panel">
+    <div class="panel-head">
+      <div>
+        <h2>SKU planning board</h2>
+        <p class="muted">Sorted by predicted revenue — click a row to focus the chart</p>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>SKU</th>
+            <th>Category</th>
+            <th>14d units</th>
+            <th>14d revenue</th>
+            <th>MAE</th>
+            <th>What this means</th>
+          </tr>
+        </thead>
+        <tbody id="skuTable"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <p>Built for business users · Pipeline: PySpark ETL · TensorFlow LSTM · LangChain agent · <a href="https://github.com/veera-1175/ForecastIQ">GitHub</a></p>
+  </footer>
+
+  <script src="./app.js"></script>
+</body>
+</html>
