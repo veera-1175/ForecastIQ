@@ -31,13 +31,28 @@
       </div>
       <a class="link-btn" id="templateLink" href="/api/demo.csv">Download demo CSV</a>
     </div>
-    <div class="upload-row">
-      <input type="file" id="csvFile" accept=".csv,text/csv" />
+
+    <label class="dropzone" id="dropzone" for="csvFile">
+      <input type="file" id="csvFile" accept=".csv,text/csv" hidden />
+      <div class="dropzone-icon" aria-hidden="true">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+          <path d="M12 16V7m0 0l-3.5 3.5M12 7l3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M5 16.5V18a2 2 0 002 2h10a2 2 0 002-2v-1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="dropzone-copy">
+        <strong id="fileLabel">Drop your CSV here or browse</strong>
+        <span id="fileMeta">.csv only · date, sku_id, units_sold required</span>
+      </div>
+      <span class="dropzone-browse">Choose file</span>
+    </label>
+
+    <div class="upload-actions">
       <button type="button" id="uploadBtn" class="primary">Run pipeline</button>
-      <button type="button" id="demoBtn" class="primary">Use demo CSV</button>
+      <button type="button" id="demoBtn" class="ghost-accent">Use demo CSV</button>
       <button type="button" id="resetBtn" class="ghost">Reset to sample</button>
     </div>
-    <p class="upload-hint">Required: <code>date</code>, <code>sku_id</code>, <code>units_sold</code>. Optional: store_id, sku_name, category, unit_price, revenue, promo_flag. Need ~30+ days per SKU. Pipeline takes about 1 minute.</p>
+    <p class="upload-hint">Optional columns: store_id, sku_name, category, unit_price, revenue, promo_flag. Need ~30+ days per SKU. Pipeline takes about 1 minute.</p>
     <p class="upload-status" id="uploadStatus" aria-live="polite"></p>
   </section>
 

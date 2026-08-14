@@ -20,7 +20,56 @@ function boot() {
   document.getElementById("uploadBtn")?.addEventListener("click", onUpload);
   document.getElementById("demoBtn")?.addEventListener("click", onDemoUpload);
   document.getElementById("resetBtn")?.addEventListener("click", onReset);
+  wireFilePicker();
   seedChat();
+}
+
+function wireFilePicker() {
+  const input = document.getElementById("csvFile");
+  const zone = document.getElementById("dropzone");
+  if (!input || !zone) return;
+
+  const syncLabel = () => {
+    const file = input.files?.[0];
+    const label = document.getElementById("fileLabel");
+    const meta = document.getElementById("fileMeta");
+    if (file) {
+      zone.classList.add("has-file");
+      label.textContent = file.name;
+      meta.textContent = `${(file.size / 1024).toFixed(1)} KB · ready to run`;
+    } else {
+      zone.classList.remove("has-file");
+      label.textContent = "Drop your CSV here or browse";
+      meta.textContent = ".csv only · date, sku_id, units_sold required";
+    }
+  };
+
+  input.addEventListener("change", syncLabel);
+
+  ["dragenter", "dragover"].forEach((evt) => {
+    zone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      zone.classList.add("dragover");
+    });
+  });
+  ["dragleave", "drop"].forEach((evt) => {
+    zone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      zone.classList.remove("dragover");
+    });
+  });
+  zone.addEventListener("drop", (e) => {
+    const file = e.dataTransfer?.files?.[0];
+    if (!file) return;
+    if (!file.name.toLowerCase().endsWith(".csv")) {
+      setStatus("Please drop a .csv file.", "err");
+      return;
+    }
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    input.files = dt.files;
+    syncLabel();
+  });
 }
 
 function renderAll() {
