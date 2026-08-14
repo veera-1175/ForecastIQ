@@ -18,3 +18,5 @@ data/uploads/
 node_modules/
 frontend/dist/
 .terraform/
+.env.deploy
+

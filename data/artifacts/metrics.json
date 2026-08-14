@@ -4,8 +4,8 @@
   "horizon_days": 14,
   "train_windows": 243,
   "test_windows": 61,
-  "overall_mae": 5.72,
-  "overall_rmse": 6.93,
+  "overall_mae": 5.73,
+  "overall_rmse": 6.92,
   "skus": 4,
-  "scaled_test_mae": 0.6071
+  "scaled_test_mae": 0.5991
 }
