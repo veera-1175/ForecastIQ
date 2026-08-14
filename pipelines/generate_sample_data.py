@@ -12,14 +12,14 @@ RAW_DIR = ROOT / "data" / "raw"
 
 
 SKUS = [
-    ("SKU-1001", "Organic Milk 1L", "Dairy", 2.49),
-    ("SKU-1002", "Whole Wheat Bread", "Bakery", 1.99),
-    ("SKU-1003", "Arabica Coffee 250g", "Beverages", 8.50),
-    ("SKU-1004", "Basmati Rice 5kg", "Grocery", 12.99),
-    ("SKU-1005", "Greek Yogurt Pack", "Dairy", 4.25),
-    ("SKU-1006", "Sparkling Water 12pk", "Beverages", 6.75),
-    ("SKU-1007", "Dark Chocolate Bar", "Snacks", 3.10),
-    ("SKU-1008", "Olive Oil 1L", "Grocery", 9.80),
+    ("SKU-1001", "Organic Milk 1L", "Dairy", 68.0),
+    ("SKU-1002", "Whole Wheat Bread", "Bakery", 45.0),
+    ("SKU-1003", "Arabica Coffee 250g", "Beverages", 420.0),
+    ("SKU-1004", "Basmati Rice 5kg", "Grocery", 650.0),
+    ("SKU-1005", "Greek Yogurt Pack", "Dairy", 95.0),
+    ("SKU-1006", "Sparkling Water 12pk", "Beverages", 280.0),
+    ("SKU-1007", "Dark Chocolate Bar", "Snacks", 120.0),
+    ("SKU-1008", "Olive Oil 1L", "Grocery", 550.0),
 ]
 
 

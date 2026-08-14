@@ -29,7 +29,7 @@ function fillTable() {
         <td><strong>${f.sku_name}</strong><br/><span style="color:#5c6b63">${f.sku_id}</span></td>
         <td>${f.category}</td>
         <td>${f.forecast_total_units.toFixed(0)}</td>
-        <td>$${f.forecast_revenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+        <td>₹${f.forecast_revenue.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</td>
         <td>${f.mae}</td>
         <td>${f.insight}</td>
       </tr>`

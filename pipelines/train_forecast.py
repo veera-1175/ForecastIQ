@@ -238,8 +238,8 @@ def _kpis(forecasts: list[dict], summary: dict) -> list[dict]:
         },
         {
             "label": "14-day forecast revenue",
-            "value": f"${total_rev:,.0f}",
-            "hint": "Units × unit price (list price assumption)",
+            "value": f"₹{total_rev:,.0f}",
+            "hint": "Units × unit price (INR list price)",
         },
         {
             "label": "Model MAE",
@@ -249,7 +249,7 @@ def _kpis(forecasts: list[dict], summary: dict) -> list[dict]:
         {
             "label": "Top revenue SKU",
             "value": top["sku_name"] if top else "—",
-            "hint": "Highest predicted revenue in the forecast window",
+            "hint": "Highest predicted revenue (INR) in the forecast window",
         },
     ]
 

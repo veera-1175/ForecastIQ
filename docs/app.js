@@ -63,7 +63,7 @@ function fillTable() {
         <td><strong>${f.sku_name}</strong><br/><span style="color:#5c6b63">${f.sku_id}</span></td>
         <td>${f.category}</td>
         <td>${f.forecast_total_units.toFixed(0)}</td>
-        <td>$${f.forecast_revenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+        <td>₹${f.forecast_revenue.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</td>
         <td>${f.mae}</td>
         <td>${f.insight}</td>
       </tr>`
@@ -152,7 +152,7 @@ function answerQuestion(question) {
   if (["revenue", "money", "top sku", "highest"].some((k) => q.includes(k))) {
     const top = forecasts[0];
     const total = forecasts.reduce((s, f) => s + f.forecast_revenue, 0);
-    return `**${top.sku_name}** leads 14-day revenue (~$${top.forecast_revenue.toFixed(2)}). All-SKU forecast revenue ~$${total.toFixed(2)}.\n\n${top.insight}`;
+    return `${top.sku_name} leads 14-day revenue (~₹${top.forecast_revenue.toLocaleString("en-IN", { maximumFractionDigits: 0 })}). All-SKU forecast revenue ~₹${total.toLocaleString("en-IN", { maximumFractionDigits: 0 })}.\n\n${top.insight}`;
   }
   if (["mae", "rmse", "accuracy", "error", "reliable"].some((k) => q.includes(k))) {
     return `Holdout evaluation: MAE ${bundle.summary.overall_mae}, RMSE ${bundle.summary.overall_rmse} (units/day). Lower is better. Treat forecasts as planning signals, not guarantees.`;
@@ -168,7 +168,7 @@ function answerQuestion(question) {
     "Planning brief from Spark → TensorFlow → LangChain context:\n\n" +
     forecasts
       .slice(0, 3)
-      .map((f) => `• ${f.sku_name}: ${f.forecast_total_units.toFixed(0)} units · $${f.forecast_revenue.toFixed(0)} · ${f.insight}`)
+      .map((f) => `• ${f.sku_name}: ${f.forecast_total_units.toFixed(0)} units · ₹${f.forecast_revenue.toLocaleString("en-IN", { maximumFractionDigits: 0 })} · ${f.insight}`)
       .join("\n")
   );
 }

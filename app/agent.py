@@ -30,7 +30,7 @@ def _tool_catalog(bundle: dict[str, Any]) -> str:
         lines.append(
             f"- {f['sku_name']} ({f['sku_id']}, {f['category']}): "
             f"next-{bundle['summary']['horizon_days']}d units={f['forecast_total_units']}, "
-            f"revenue=${f['forecast_revenue']}, MAE={f['mae']}, insight={f['insight']}"
+            f"revenue=₹{f['forecast_revenue']}, MAE={f['mae']}, insight={f['insight']}"
         )
     return "\n".join(lines)
 
@@ -54,13 +54,13 @@ def _rule_based_answer(question: str, bundle: dict[str, Any]) -> str:
             "use that as a safety buffer when setting reorder points."
         )
 
-    if any(k in q for k in ["revenue", "money", "sales $", "top sku", "highest"]):
+    if any(k in q for k in ["revenue", "money", "sales", "rupee", "inr", "top sku", "highest"]):
         top = forecasts[0]
         total = sum(f["forecast_revenue"] for f in forecasts)
         return (
             f"**{top['sku_name']}** is the top revenue SKU in the next 14 days "
-            f"(~${top['forecast_revenue']:,.2f}). "
-            f"All-SKU forecast revenue is ~${total:,.2f}.\n\n{top['insight']}"
+            f"(~₹{top['forecast_revenue']:,.2f}). "
+            f"All-SKU forecast revenue is ~₹{total:,.2f}.\n\n{top['insight']}"
         )
 
     if any(k in q for k in ["mae", "rmse", "accuracy", "error", "reliable"]):
@@ -87,7 +87,7 @@ def _rule_based_answer(question: str, bundle: dict[str, Any]) -> str:
     # default brief
     top3 = forecasts[:3]
     lines = "\n".join(
-        f"• {f['sku_name']}: {f['forecast_total_units']:.0f} units · ${f['forecast_revenue']:,.0f} · {f['insight']}"
+        f"• {f['sku_name']}: {f['forecast_total_units']:.0f} units · ₹{f['forecast_revenue']:,.0f} · {f['insight']}"
         for f in top3
     )
     return (
