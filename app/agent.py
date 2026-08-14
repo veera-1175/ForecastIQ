@@ -97,6 +97,16 @@ def _rule_based_answer(question: str, bundle: dict[str, Any]) -> str:
     )
 
 
+SYSTEM_PROMPT = (
+    "You are ForecastIQ, a retail demand insight agent for store managers and business users in India. "
+    "Answer ANY business question using the forecast context below — restock, promos, category outlook, "
+    "risk, revenue in INR (₹), model accuracy, comparisons, and what-if planning. "
+    "Be concrete: cite SKU names, units, ₹ amounts, MAE/RMSE when relevant. "
+    "Use short paragraphs and bullets. If the context cannot support an answer, say what is missing. "
+    "Never invent SKUs or metrics that are not in the context.\n\nCONTEXT:\n"
+)
+
+
 def answer_question(question: str) -> dict[str, Any]:
     bundle = load_bundle()
     catalog = _tool_catalog(bundle)
@@ -116,14 +126,7 @@ def answer_question(question: str) -> dict[str, Any]:
 
             llm = ChatOpenAI(model="gpt-4o-mini", api_key=openai_key, temperature=0.2)
             messages = [
-                SystemMessage(
-                    content=(
-                        "You are ForecastIQ, a retail demand insight agent for business users. "
-                        "Answer clearly with short paragraphs and bullets. Use only the forecast context. "
-                        "Explain what numbers mean for inventory and revenue decisions. "
-                        "If unsure, say what is unknown.\n\nCONTEXT:\n" + catalog
-                    )
-                ),
+                SystemMessage(content=SYSTEM_PROMPT + catalog),
                 HumanMessage(content=question),
             ]
             answer = llm.invoke(messages).content
@@ -135,14 +138,7 @@ def answer_question(question: str) -> dict[str, Any]:
 
             llm = ChatGroq(model="llama-3.1-8b-instant", api_key=groq_key, temperature=0.2)
             messages = [
-                SystemMessage(
-                    content=(
-                        "You are ForecastIQ, a retail demand insight agent for business users. "
-                        "Answer clearly with short paragraphs and bullets. Use only the forecast context. "
-                        "Explain what numbers mean for inventory and revenue decisions.\n\nCONTEXT:\n"
-                        + catalog
-                    )
-                ),
+                SystemMessage(content=SYSTEM_PROMPT + catalog),
                 HumanMessage(content=question),
             ]
             answer = llm.invoke(messages).content
@@ -162,8 +158,9 @@ def answer_question(question: str) -> dict[str, Any]:
         "used_llm": used_llm,
         "suggestions": [
             "Which SKUs should we restock first?",
-            "What is the 14-day revenue outlook?",
+            "What is the 14-day revenue outlook in rupees?",
             "How accurate is the model (MAE/RMSE)?",
-            "How is Dairy category demand looking?",
+            "If Dairy softens, what should we do?",
+            "Compare Coffee vs Olive Oil demand risk",
         ],
     }

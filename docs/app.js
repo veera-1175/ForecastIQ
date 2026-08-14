@@ -175,15 +175,16 @@ function answerQuestion(question) {
 
 function seedChat() {
   addBubble(
-    "Hi — I’m your demand insight agent. Ask about restock, revenue, categories, or model accuracy. Answers are grounded in the Spark → TensorFlow forecast.",
+    "Hi — I’m your demand insight agent powered by Groq + LangChain. Ask any planning question — restock, promos, category risk, ₹ revenue, or model accuracy. Answers stay grounded in the Spark → TensorFlow forecast.",
     "bot",
     "ready"
   );
   const tips = [
     "Which SKUs should we restock first?",
-    "What is the 14-day revenue outlook?",
+    "What is the 14-day revenue outlook in rupees?",
     "How accurate is the model (MAE/RMSE)?",
-    "How is Dairy category demand looking?",
+    "If Dairy softens, what should we do?",
+    "Compare Coffee vs Olive Oil demand risk",
   ];
   const suggestions = document.getElementById("suggestions");
   suggestions.innerHTML = tips.map((t) => `<button type="button">${t}</button>`).join("");
@@ -195,14 +196,40 @@ function seedChat() {
   });
 }
 
-function onChat(e) {
+async function askAgent(question) {
+  const base = (window.FORECASTIQ_API || "").replace(/\/$/, "");
+  if (base) {
+    const res = await fetch(`${base}/api/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "1" },
+      body: JSON.stringify({ question }),
+    });
+    if (!res.ok) throw new Error(`API ${res.status}`);
+    const data = await res.json();
+    return { answer: data.answer, meta: data.backend || "langchain-groq" };
+  }
+  return { answer: answerQuestion(question), meta: "local-rules" };
+}
+
+async function onChat(e) {
   e.preventDefault();
   const input = document.getElementById("chatInput");
   const q = input.value.trim();
   if (!q) return;
   addBubble(q, "user");
   input.value = "";
-  addBubble(answerQuestion(q), "bot", "forecast-grounded");
+  const thinking = document.createElement("div");
+  thinking.className = "bubble bot";
+  thinking.textContent = "Thinking with forecast context…";
+  document.getElementById("chatLog").appendChild(thinking);
+  try {
+    const { answer, meta } = await askAgent(q);
+    thinking.remove();
+    addBubble(answer, "bot", meta);
+  } catch (err) {
+    thinking.remove();
+    addBubble(answerQuestion(q), "bot", "local-fallback");
+  }
 }
 
 boot().catch((err) => {
