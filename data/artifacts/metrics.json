@@ -2,10 +2,10 @@
   "model": "TensorFlow LSTM",
   "window": 14,
   "horizon_days": 14,
-  "train_windows": 1062,
-  "test_windows": 266,
-  "overall_mae": 4.14,
-  "overall_rmse": 5.62,
-  "skus": 8,
-  "scaled_test_mae": 0.5695
+  "train_windows": 243,
+  "test_windows": 61,
+  "overall_mae": 5.72,
+  "overall_rmse": 6.93,
+  "skus": 4,
+  "scaled_test_mae": 0.6071
 }

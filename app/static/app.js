@@ -12,12 +12,13 @@ function apiUrl(path) {
 
 function boot() {
   const template = document.getElementById("templateLink");
-  if (template) template.href = apiUrl("/api/template.csv");
+  if (template) template.href = apiUrl("/api/demo.csv");
 
   renderAll();
   document.getElementById("skuSelect").addEventListener("change", (e) => renderSku(e.target.value));
   document.getElementById("chatForm").addEventListener("submit", onChat);
   document.getElementById("uploadBtn")?.addEventListener("click", onUpload);
+  document.getElementById("demoBtn")?.addEventListener("click", onDemoUpload);
   document.getElementById("resetBtn")?.addEventListener("click", onReset);
   seedChat();
 }
@@ -177,33 +178,61 @@ function setStatus(msg, kind = "") {
   el.className = `upload-status ${kind}`.trim();
 }
 
+async function applyBundle(data, okMessage) {
+  bundle = data.bundle;
+  window.__FORECAST_BUNDLE__ = bundle;
+  renderAll();
+  setStatus(okMessage, "ok");
+  addBubble("Forecast refreshed from your CSV. Ask me anything about the new outlook.", "bot", "upload");
+}
+
 async function onUpload() {
   const input = document.getElementById("csvFile");
   const btn = document.getElementById("uploadBtn");
   if (!input?.files?.length) {
-    setStatus("Choose a CSV file first.", "err");
+    setStatus("Choose a CSV file first, or click Use demo CSV.", "err");
     return;
   }
   const fd = new FormData();
   fd.append("file", input.files[0]);
   btn.disabled = true;
-  setStatus("Uploading and running Spark ETL → TensorFlow… this can take ~1 minute.");
+  document.getElementById("demoBtn")?.setAttribute("disabled", "true");
+  setStatus("Uploading and running Spark ETL → TensorFlow… ~1 minute. Keep this tab open.");
   try {
     const res = await fetch(apiUrl("/api/upload"), { method: "POST", body: fd, headers: { "ngrok-skip-browser-warning": "1" } });
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || "Upload failed");
-    bundle = data.bundle;
-    window.__FORECAST_BUNDLE__ = bundle;
-    renderAll();
-    setStatus(
-      `Done — ${data.ingest.rows} rows, ${data.ingest.skus} SKUs (${data.ingest.date_min} → ${data.ingest.date_max}). Forecast refreshed.`,
-      "ok"
+    await applyBundle(
+      data,
+      `Done — ${data.ingest.rows} rows, ${data.ingest.skus} SKUs (${data.ingest.date_min} → ${data.ingest.date_max}).`
     );
-    addBubble("Your CSV was ingested. Ask me anything about the new forecast.", "bot", "upload");
   } catch (err) {
     setStatus(String(err.message || err), "err");
   } finally {
     btn.disabled = false;
+    document.getElementById("demoBtn")?.removeAttribute("disabled");
+  }
+}
+
+async function onDemoUpload() {
+  const btn = document.getElementById("demoBtn");
+  const uploadBtn = document.getElementById("uploadBtn");
+  btn.disabled = true;
+  uploadBtn.disabled = true;
+  setStatus("Running demo CSV through Spark ETL → TensorFlow… ~1 minute.");
+  try {
+    const res = await fetch(apiUrl("/api/upload-demo"), { method: "POST", headers: { "ngrok-skip-browser-warning": "1" } });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "Demo upload failed");
+    await applyBundle(
+      data,
+      `Demo done — ${data.ingest.rows} rows, ${data.ingest.skus} SKUs. Charts updated (Coffee, Milk, Atta, Chips).`
+    );
+  } catch (err) {
+    setStatus(String(err.message || err), "err");
+  } finally {
+    btn.disabled = false;
+    uploadBtn.disabled = false;
   }
 }
 

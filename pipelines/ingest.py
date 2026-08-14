@@ -14,6 +14,7 @@ RAW = ROOT / "data" / "raw" / "retail_sales.csv"
 RAW_BACKUP = ROOT / "data" / "raw" / "retail_sales.sample.csv"
 UPLOADS = ROOT / "data" / "uploads"
 TEMPLATE = ROOT / "data" / "templates" / "sales_template.csv"
+DEMO_CSV = ROOT / "data" / "templates" / "demo_upload.csv"
 
 REQUIRED = {"date", "sku_id", "units_sold"}
 OPTIONAL_DEFAULTS = {
@@ -32,6 +33,19 @@ def ensure_sample_backup() -> None:
 
 
 def write_template() -> Path:
+    """Alias: ship the full demo CSV as the downloadable template."""
+    return ensure_demo_csv()
+
+
+def ensure_demo_csv() -> Path:
+    if not DEMO_CSV.exists():
+        from pipelines.build_demo_csv import build
+
+        build()
+    return DEMO_CSV
+
+
+def write_mini_template() -> Path:
     TEMPLATE.parent.mkdir(parents=True, exist_ok=True)
     sample = pd.DataFrame(
         [

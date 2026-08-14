@@ -13,7 +13,7 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
 
 from app.agent import answer_question, load_bundle
-from pipelines.ingest import ingest_csv_bytes, reset_to_sample, run_pipeline, write_template
+from pipelines.ingest import ensure_demo_csv, ingest_csv_bytes, reset_to_sample, run_pipeline, write_template
 
 load_dotenv()
 
@@ -72,7 +72,35 @@ def forecast():
 @app.get("/api/template.csv")
 def template_csv():
     path = write_template()
-    return FileResponse(path, media_type="text/csv", filename="forecastiq_sales_template.csv")
+    return FileResponse(path, media_type="text/csv", filename="forecastiq_demo_upload.csv")
+
+
+@app.get("/api/demo.csv")
+def demo_csv():
+    path = ensure_demo_csv()
+    return FileResponse(path, media_type="text/csv", filename="forecastiq_demo_upload.csv")
+
+
+@app.post("/api/upload-demo")
+def upload_demo():
+    """One-click demo: ingest the packaged demo CSV and refresh forecasts."""
+    try:
+        path = ensure_demo_csv()
+        content = path.read_bytes()
+        meta = ingest_csv_bytes(content, path.name)
+        result = run_pipeline(epochs=6)
+        bundle = load_bundle()
+        return {
+            "ok": True,
+            "message": "Demo CSV processed: Spark ETL -> TensorFlow forecast refreshed.",
+            "ingest": meta,
+            "pipeline": result,
+            "bundle": bundle,
+        }
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(status_code=500, detail=f"Pipeline failed: {exc}") from exc
 
 
 @app.post("/api/upload")
